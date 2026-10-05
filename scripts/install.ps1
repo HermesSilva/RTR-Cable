@@ -34,8 +34,15 @@ if (-not (Test-Path $inf)) {
     Write-Error "No driver package: AudioMirror.inf is neither beside this script nor in $here. Build it (scriptsuild.ps1 -Sign) or unpack the rtr-cable-x64 artifact there."
 }
 
-$testSigning = (bcdedit /enum '{current}' | Select-String -Pattern 'testsigning\s+Yes') -ne $null
-if (-not $testSigning) {
+# Test-signing mode as the running system has it (the boot options it
+# started with), not as the boot configuration says: the setting only counts
+# after a restart.
+$running = (Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control').SystemStartOptions -match 'TESTSIGNING'
+$configured = (bcdedit /enum '{current}' | Select-String -Pattern 'testsigning\s+Yes') -ne $null
+if (-not $running -and $configured) {
+    Write-Error 'Test-signing mode is set but Windows was not restarted since: restart the computer and run this script again.'
+}
+if (-not $running) {
     Write-Error ("Test-signing mode is off: Windows will not load this driver. " +
                  "With Secure Boot off in the firmware, run 'bcdedit /set testsigning on', restart, and run this script again. " +
                  "On a disk protected by BitLocker, suspend it first (Suspend-BitLocker -MountPoint C: -RebootCount 1) or have the recovery key at hand.")
@@ -94,7 +101,14 @@ public static extern bool SetupDiDestroyDeviceInfoList(IntPtr DeviceInfoSet);
 # The driver goes into the store and onto every device with its hardware id.
 pnputil /add-driver $inf /install
 if ($LASTEXITCODE -ne 0) { Write-Error 'pnputil could not install the driver.' }
+# Installed is not loaded: Windows says whether it started the driver.
+Start-Sleep -Seconds 2
+$device = Get-PnpDevice -Class MEDIA -ErrorAction SilentlyContinue | Where-Object { $_.HardwareID -contains $hardwareId } | Select-Object -First 1
+if (-not $device -or $device.Status -ne 'OK') {
+    $problem = if ($device) { $device.Problem } else { 'no device' }
+    Write-Error "The driver is installed but Windows did not start it ($problem). CM_PROB_UNSIGNED_DRIVER means the signature was refused: test-signing mode is not in effect."
+}
 Write-Output ''
-Write-Output 'Installed. In the sound settings of Windows:'
+Write-Output 'Installed and running. In the sound settings of Windows:'
 Write-Output '  playback  "RTR-Cable Input"   - what a player sends here goes into the cable'
 Write-Output '  recording "RTR-Cable Output"  - the other end; in RTR-Bench it is an IN group on the rack'
