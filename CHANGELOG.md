@@ -16,6 +16,15 @@ Fork of [AudioMirror](https://github.com/JannesP/AudioMirror) at commit
 - README rewritten: what the driver is, the state it is in, what
   test-signing means, how to install, use with RTR-Bench, build and remove.
 
+### Fixed
+
+- Builds with the current Windows Driver Kit (10.0.26100): the Release
+  configuration links the port class libraries (upstream set them up for
+  Debug only), an `if` whose body is a debug print no longer ends in an
+  empty statement, and the deprecation of `ExAllocatePoolWithTag` does not
+  stop the build (the calls are unchanged).
+- The INF declares `PnpLockdown=1`, as InfVerif asks.
+
 ### Added
 
 - `scripts\build.ps1`: builds the x64 package into `package\`; `-Sign`

@@ -26,7 +26,8 @@ finished. What this fork has today:
   and scripts that install and remove it;
 - **the driver is test-signed, not production-signed** (next section).
 
-The build is checked by the workflow. Installation was **not** tested by the
+The workflow builds the package with the Windows Driver Kit 10.0.26100,
+verifies the INF and test-signs the driver. Installation was **not** tested by the
 fork yet: the computer it is developed on has no test-signing mode.
 
 ## Signing: read before installing
