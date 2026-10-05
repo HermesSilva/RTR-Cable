@@ -25,8 +25,10 @@ if (-not $msbuild) { Write-Error 'MSBuild not found: install Visual Studio with 
 
 # The WDK signs by itself only with a certificate in the store of the user;
 # signing is done below instead, so the build is the same everywhere.
+# InfVerif is skipped: MSBuild of 64 bits cannot load the 32-bit InfVerif.dll
+# of the kit (the INF is still checked by Windows when the driver is installed).
 & $msbuild (Join-Path $root 'AudioMirror.sln') /m /nologo /v:minimal `
-    "/p:Configuration=$configuration" /p:Platform=x64 /p:SignMode=Off /p:SpectreMitigation=false
+    "/p:Configuration=$configuration" /p:Platform=x64 /p:SignMode=Off /p:SpectreMitigation=false /p:EnableInfVerif=false
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 $built = Join-Path $root "x64\$configuration\AudioMirror"
