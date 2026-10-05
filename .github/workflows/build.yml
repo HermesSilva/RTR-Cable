@@ -1,0 +1,29 @@
+# RTR-Cable - builds the driver package (x64, Release) with the Windows
+# Driver Kit of the runner and test-signs it with a certificate made for the
+# run. The artifact is what scripts\install.ps1 installs on a computer in
+# test-signing mode.
+name: build
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  driver:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: microsoft/setup-msbuild@v2
+
+      - name: Build the driver
+        shell: pwsh
+        run: scripts\build.ps1 -Sign
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rtr-cable-x64
+          path: package/
+          if-no-files-found: error

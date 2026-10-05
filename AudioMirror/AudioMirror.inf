@@ -1,5 +1,7 @@
 ;
-; AudioMirror.inf
+; AudioMirror.inf - RTR-Cable, a virtual audio cable (fork of AudioMirror).
+; The names the user sees are RTR-Cable; the file, service and hardware
+; names stay those of the upstream project.
 ;
 
 [Version]
@@ -112,17 +114,17 @@ KmdfLibraryVersion = $KMDFVERSION$
 
 [Strings]
 SPSVCINST_ASSOCSERVICE= 0x00000002
-OrganizationName="Jannes Peters"
-DriverDisplayName="AudioMirror Drivers"
-DiskName="AudioMirror Installation Disk"
-AudioMirror.DeviceDesc="AudioMirror Virtual Device"
-AudioMirror.SVCDESC="AudioMirror Service"
+OrganizationName="RTR-Bench"
+DriverDisplayName="RTR-Cable virtual audio cable"
+DiskName="RTR-Cable Installation Disk"
+AudioMirror.DeviceDesc="RTR-Cable"
+AudioMirror.SVCDESC="RTR-Cable virtual audio cable"
 
-AudioMirror.WaveCapture.FriendlyName="AudioMirror Wave Input"
-AudioMirror.TopologyCapture.FriendlyName="AudioMirror Topology Input"
+AudioMirror.WaveCapture.FriendlyName="RTR-Cable Output"
+AudioMirror.TopologyCapture.FriendlyName="RTR-Cable Output Topology"
 
-AudioMirror.WaveRender.FriendlyName="AudioMirror Wave Output"
-AudioMirror.TopologyRender.FriendlyName="AudioMirror Topology Output"
+AudioMirror.WaveRender.FriendlyName="RTR-Cable Input"
+AudioMirror.TopologyRender.FriendlyName="RTR-Cable Input Topology"
 
 ;non-localizable
 KSNAME_WaveCapture="WaveCaptureTemplate"
