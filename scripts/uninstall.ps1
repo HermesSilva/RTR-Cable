@@ -6,7 +6,10 @@ $hardwareId = 'Root\AudioMirror'
 
 $identity = [Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
 if (-not $identity.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    Write-Error 'Run this script as administrator.'
+    Write-Output 'Administrator rights are needed: asking Windows for them.'
+    $shell = (Get-Process -Id $PID).Path
+    Start-Process -FilePath $shell -Verb RunAs -ArgumentList @('-NoExit', '-ExecutionPolicy', 'Bypass', '-File', "`"$PSCommandPath`"")
+    return
 }
 
 $devices = @(Get-PnpDevice -Class MEDIA -ErrorAction SilentlyContinue | Where-Object { $_.HardwareID -contains $hardwareId })

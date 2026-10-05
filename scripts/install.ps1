@@ -12,20 +12,33 @@
 # installs the driver on it - what "devcon install AudioMirror.inf
 # Root\AudioMirror" does, without needing devcon.
 $ErrorActionPreference = 'Stop'
+# The package is the folder this script is in; run from the scripts folder
+# of the repository, it is the package\ folder beside it (scriptsuild.ps1,
+# or the rtr-cable-x64 artifact of the workflow unpacked there).
 $here = $PSScriptRoot
+if (-not (Test-Path (Join-Path $here 'AudioMirror.inf'))) {
+    $here = Join-Path (Split-Path -Parent $PSScriptRoot) 'package'
+}
 $inf = Join-Path $here 'AudioMirror.inf'
 $hardwareId = 'Root\AudioMirror'
 
 $identity = [Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
 if (-not $identity.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    Write-Error 'Run this script as administrator.'
+    # Asks for elevation (the consent prompt of Windows) and runs again there.
+    Write-Output 'Administrator rights are needed: asking Windows for them.'
+    $shell = (Get-Process -Id $PID).Path
+    Start-Process -FilePath $shell -Verb RunAs -ArgumentList @('-NoExit', '-ExecutionPolicy', 'Bypass', '-File', "`"$PSCommandPath`"")
+    return
 }
-if (-not (Test-Path $inf)) { Write-Error "AudioMirror.inf not found beside this script ($here)." }
+if (-not (Test-Path $inf)) {
+    Write-Error "No driver package: AudioMirror.inf is neither beside this script nor in $here. Build it (scriptsuild.ps1 -Sign) or unpack the rtr-cable-x64 artifact there."
+}
 
 $testSigning = (bcdedit /enum '{current}' | Select-String -Pattern 'testsigning\s+Yes') -ne $null
 if (-not $testSigning) {
     Write-Error ("Test-signing mode is off: Windows will not load this driver. " +
-                 "Switch Secure Boot off in the firmware, run 'bcdedit /set testsigning on', restart, and run this script again.")
+                 "With Secure Boot off in the firmware, run 'bcdedit /set testsigning on', restart, and run this script again. " +
+                 "On a disk protected by BitLocker, suspend it first (Suspend-BitLocker -MountPoint C: -RebootCount 1) or have the recovery key at hand.")
 }
 
 $certificate = Join-Path $here 'RTR-Cable-test.cer'

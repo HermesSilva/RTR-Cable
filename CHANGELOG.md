@@ -38,6 +38,10 @@ Fork of [AudioMirror](https://github.com/JannesP/AudioMirror) at commit
   publishes it as the artifact `rtr-cable-x64`.
 - This changelog.
 
+- `install.ps1` and `uninstall.ps1` ask Windows for administrator rights
+  when started without them, and `install.ps1` run from `scripts\` uses the
+  package in `package\`.
+
 ### Known limits
 
 - Test-signed only: needs Secure Boot off and test-signing mode. Production
