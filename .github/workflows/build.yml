@@ -24,9 +24,10 @@ jobs:
         shell: pwsh
         continue-on-error: true
         run: |
-          $f = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kitsuild\*\WindowsDriver.common.targets" | Select-Object -Last 1
-          (Get-Content $f.FullName)[660..700]
-          Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits" -Recurse -Filter InfVerif.dll -ErrorAction SilentlyContinue | ForEach-Object FullName
+          $kits = Join-Path ${env:ProgramFiles(x86)} 'Windows Kits/10'
+          $targets = Get-ChildItem (Join-Path $kits 'build/*/WindowsDriver.common.targets') | Select-Object -Last 1
+          (Get-Content $targets.FullName)[676..696]
+          Get-ChildItem $kits -Recurse -Filter InfVerif.dll -ErrorAction SilentlyContinue | ForEach-Object FullName
 
       - name: Build the driver
         shell: pwsh
