@@ -1,0 +1,14 @@
+<!-- RTR-Cable - settings on top of the upstream project, kept out of its
+     file so that the fork stays easy to merge.
+
+     C4996: the driver allocates with ExAllocatePoolWithTag, which the
+     current WDK marks deprecated in favour of ExAllocatePool2 (Windows 10
+     2004 and later, zero-initialising). The calls are upstream's and still
+     work; moving them is a change to make with a computer to test on. -->
+<Project>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <DisableSpecificWarnings>4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+  </ItemDefinitionGroup>
+</Project>
