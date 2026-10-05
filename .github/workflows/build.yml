@@ -18,16 +18,7 @@ jobs:
 
       - uses: microsoft/setup-msbuild@v2
         with:
-          msbuild-architecture: x64
-
-      - name: Show the INF verification step of the kit
-        shell: pwsh
-        continue-on-error: true
-        run: |
-          $kits = Join-Path ${env:ProgramFiles(x86)} 'Windows Kits/10'
-          $targets = Get-ChildItem (Join-Path $kits 'build/*/WindowsDriver.common.targets') | Select-Object -Last 1
-          (Get-Content $targets.FullName)[676..696]
-          Get-ChildItem $kits -Recurse -Filter InfVerif.dll -ErrorAction SilentlyContinue | ForEach-Object FullName
+          msbuild-architecture: x64   # InfVerif of the kit is 64-bit
 
       - name: Build the driver
         shell: pwsh

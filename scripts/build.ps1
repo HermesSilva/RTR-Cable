@@ -19,16 +19,16 @@ $configuration = if ($Debug) { 'Debug' } else { 'Release' }
 $msbuild = (Get-Command msbuild.exe -ErrorAction SilentlyContinue).Source
 if (-not $msbuild) {
     $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
-    $msbuild = & $vswhere -latest -products * -requires Microsoft.Component.MSBuild -find 'MSBuild\**\Bin\MSBuild.exe' | Select-Object -First 1
+    $msbuild = & $vswhere -latest -products * -requires Microsoft.Component.MSBuild -find 'MSBuild\**\Binmd64\MSBuild.exe' | Select-Object -First 1
 }
 if (-not $msbuild) { Write-Error 'MSBuild not found: install Visual Studio with the C++ workload and the WDK.' }
 
 # The WDK signs by itself only with a certificate in the store of the user;
 # signing is done below instead, so the build is the same everywhere.
-# InfVerif is skipped: MSBuild of 64 bits cannot load the 32-bit InfVerif.dll
-# of the kit (the INF is still checked by Windows when the driver is installed).
+# The build verifies the INF with InfVerif, which the kit ships for 64-bit
+# MSBuild only: the 64-bit MSBuild is the one used.
 & $msbuild (Join-Path $root 'AudioMirror.sln') /m /nologo /v:minimal `
-    "/p:Configuration=$configuration" /p:Platform=x64 /p:SignMode=Off /p:SpectreMitigation=false /p:EnableInfVerif=false
+    "/p:Configuration=$configuration" /p:Platform=x64 /p:SignMode=Off /p:SpectreMitigation=false
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 $built = Join-Path $root "x64\$configuration\AudioMirror"
